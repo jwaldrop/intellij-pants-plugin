@@ -4,6 +4,8 @@
 package com.twitter.intellij.pants.quickfix;
 
 import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.ide.actions.SynchronizeAction;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
@@ -82,6 +84,12 @@ public class AddPantsTargetDependencyFix extends PantsQuickFix {
       return;
     }
 
+    final Document document = FileDocumentManager.getInstance().getDocument(buildFile.getVirtualFile());
+    if (document != null) {
+      // save before editing
+      FileDocumentManager.getInstance().saveDocument(document);
+    }
+
     final Project project = buildFile.getProject();
     final PyElementGenerator generator = PyElementGenerator.getInstance(project);
     final String targetAddressStringToAdd = addressToAdd.toString();
@@ -112,7 +120,7 @@ public class AddPantsTargetDependencyFix extends PantsQuickFix {
       }
       CodeStyleManager.getInstance(project).reformat(dependenciesArgument);
     }
-    FileDocumentManager.getInstance().saveAllDocuments(); // dump VFS to FS before refreshing
+    new SynchronizeAction().actionPerformed(null); // sync before refreshing
     PantsUtil.refreshAllProjects(project);
   }
 }
