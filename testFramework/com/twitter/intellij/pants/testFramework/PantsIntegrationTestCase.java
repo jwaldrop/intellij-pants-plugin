@@ -145,9 +145,8 @@ public abstract class PantsIntegrationTestCase extends ExternalSystemImportingTe
         }
         for (File child : children) {
           final File copiedChild = new File(projectDir, child.getName());
-          if (copiedChild.exists()) {
-            assertTrue("Failed to clean up!", FileUtil.delete(copiedChild));
-          }
+          assertTrue("Repo is corrupted. Can't find " + child.getName(), copiedChild.exists());
+          assertTrue("Failed to clean up!", FileUtil.delete(copiedChild));
         }
       }
     } else {
